@@ -8,16 +8,15 @@ default_args = {
     'owner':'dinesh',
     'retries': 5,
     'retry_delay': timedelta(minutes=2)
-}   
+}
 
 with DAG(
-    dag_id='dag_with_catchup_and_backfill_v1',
+    dag_id='cron_dag_v1',
     default_args=default_args,
-    description='dag example with backfill and catchup',
-    schedule_interval=timedelta(days=1),
+    description='Running dag with cron expression',
+    schedule_interval='0 0 * * *',
     start_date=days_ago(5),
-    tags=['example'],
-    catchup=True
+    tags=['cron schedule example']
 ) as dag:
     task1= BashOperator(
         task_id='task1',
