@@ -10,17 +10,20 @@ default_args = {
 }
 
 def greet(age, ti):
-    name = ti.xcom_pull(task_ids='xcom_pusher')
+    first_name = ti.xcom_pull(task_ids='xcom_pusher', key='firstname')
+    last_name = ti.xcom_pull(task_ids='xcom_pusher', key='lastname')
+    name = first_name + ' ' + last_name
     print(name)
-    print(f"Hello, my name is {name[0]} and I am {age} years old")
+    print(f"Hello, my name is {name} and I am {age} years old")
 
 
-def xcom_pusher(*args):
-    return args
+def xcom_pusher(ti):
+    ti.xcom_push(key='firstname', value='Dinesh')
+    ti.xcom_push(key='lastname', value='kumar')
 
 with DAG(
     default_args=default_args,
-    dag_id='python_operator_dag_v2',
+    dag_id='python_operator_dag_v3',
     description='Running python operator dag',
     start_date=datetime(2025, 2, 20),
     schedule_interval='@daily'
@@ -32,8 +35,7 @@ with DAG(
     
     task2 = PythonOperator(
         task_id='xcom_pusher',
-        python_callable=xcom_pusher,
-        op_args=['Testing xcom pusher', 'random', 'args']
+        python_callable=xcom_pusher
     )
 
     task2 >> task1
